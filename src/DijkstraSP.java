@@ -4,6 +4,7 @@ public class DijkstraSP {
     public DirectedEdge[] edgeTo;
     public double[] distTo;
     public PriorityQueue<Node> pq;
+    public Set<Integer> inTree;
 
     class Node implements Comparable<Node> {
         int v;
@@ -36,11 +37,14 @@ public class DijkstraSP {
         edgeTo = new DirectedEdge[G.V];
         distTo = new double[G.V];
         pq = new PriorityQueue<Node>();
+        inTree = new HashSet<>();
+
         for (int v = 0; v < G.V; v++) {
             distTo[v] = Double.MAX_VALUE;
         }
         distTo[s] = 0.0;
         pq.add(new Node(s, 0.0));
+        inTree.add(s);
 
         while (!pq.isEmpty()) {
             int v = pq.poll().v;
@@ -55,12 +59,19 @@ public class DijkstraSP {
         if (distTo[w] > distTo[v] + e.weight) {
             distTo[w] = distTo[v] + e.weight;
             edgeTo[w] = e;
-            if (pq.contains(new Node(w, distTo[w]))) {
+            if (inTree.contains(w)) {
                 pq.remove(new Node(w, distTo[w]));
                 pq.add(new Node(w, distTo[w]));
             }
-            else pq.add(new Node(w, distTo[w]));
+            else {
+                pq.add(new Node(w, distTo[w]));
+                inTree.add(w);
+            }
         }
+    }
+
+    public boolean hasPathTo(int v) {
+        return distTo[v] < Double.POSITIVE_INFINITY;
     }
 
     public double distTo(int v) {
